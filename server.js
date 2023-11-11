@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 
 const authRoutes = require('./routes/authRoutes'); 
 const blogRoutes = require('./routes/blogRoutes'); 
+const userInteractionRoutes = require('./routes/userInteractionRoutes');
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,8 +32,7 @@ mongoose.connect('mongodb://127.0.0.1/WebAssignment02', {
 
 app.use('/', authRoutes);
 app.use('/', blogRoutes);
-
-
+app.use('/', userInteractionRoutes);
 
   
 
