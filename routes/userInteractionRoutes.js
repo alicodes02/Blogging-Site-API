@@ -12,7 +12,7 @@ const authenticateUser = async (req, res, next) => {
             return res.status(401).send({ error: 'Token is not correct' });
         }
 
-        const decoded = jwt.verify(token, 'sshhhh');
+        const decoded = jwt.verify(token.replace('Bearer ', ''), 'sshhhh');
 
         const user = await User.findOne({ email: decoded.email });
 
@@ -63,7 +63,7 @@ router.get('/feed', authenticateUser, async (req, res) => {
         // Get posts from followed bloggers
         const feedPosts = await Blog.find({ owner: { $in: currentUser.followers } })
             .populate('owner', 'username email')
-            .sort({ createdAt: -1 }); // Sort by creation date in descending order
+            .sort({ content: -1 }); // Sort by creation date in descending order
 
         res.status(200).json({ feed: feedPosts });
     } catch (error) {

@@ -1,17 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const User = require('../models/Users');
 const Blog = require('../models/Blog');
 const jwt = require('jsonwebtoken');
 
 // Admin middleware to check if the request is made by an admin
+
 const isAdmin = async (req, res, next) => {
 
-    try {
-        
-        const { userName, password } = req.body;
+        console.log('Request received at IsAdmin');
 
-        if (userName === 'admin' && password === '098') {
+        const { username, password } = req.body;
+
+        if (username === 'admin' && password === '098') {
             
             next();
         }
@@ -20,22 +21,18 @@ const isAdmin = async (req, res, next) => {
 
             res.status(401).send('Invalid Credentials! Admin Access is required!');
         }
-
-        
-
-    } catch (error) {
-        console.error('Error in admin authentication:', error);
-        res.status(401).send({ error: 'Error during admin authentication. Check the server logs for details.' });
-    }
+    
 };
 
 // Route to view all users (admin access required)
 
-router.get('/admin/users', isAdmin, async (req, res) => {
+router.get('/all-users', isAdmin, async (req, res) => {
+
+    console.log('Request received at get users route');
 
     try {
 
-        const users = await User.find({}, 'username email');
+        const users = await User.find({}, 'username email password followers');
         res.status(200).json({ users });
 
     } 
@@ -77,7 +74,7 @@ router.get('/admin/blog-posts', isAdmin, async (req, res) => {
 
         const blogPosts = await Blog.find({})
             .populate('owner', 'username email')
-            .select('title owner createdAt averageRating');
+            .select('title author createdAt averageRating');
 
         res.status(200).json({ blogPosts });
 

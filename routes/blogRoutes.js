@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const authenticateUser = async (req, res, next) => {
 
     try {
+
         const token = req.header('Authorization');
 
         if (!token) {
@@ -14,7 +15,7 @@ const authenticateUser = async (req, res, next) => {
             return res.status(401).send({ error: 'Token is not correct' });
         }
 
-        const decoded = jwt.verify(token, 'sshhhh');
+        const decoded = jwt.verify(token.replace('Bearer ', ''), 'sshhhh');
 
         const user = await User.findOne({ email: decoded.email });
 
@@ -66,7 +67,9 @@ router.get('/all-blogs', async (req, res) => {
 });
 
 // Retrieve a specific blog post by ID
+
 router.get('/blog/:id', async (req, res) => {
+
     try {
         const blog = await Blog.findById(req.params.id).populate('owner', 'userName email');
         if (!blog) {
@@ -106,18 +109,16 @@ router.put('/update-blog/:id', authenticateUser, async (req, res) => {
 
 // Delete a specific blog post by ID
 router.delete('/delete-blog/:id', authenticateUser, async (req, res) => {
+
     try {
+
         const currentUser = req.user;
-        const blog = await Blog.findOne({ _id: req.params.id, owner: currentUser._id });
-
-        if (!blog) {
-            return res.status(404).json({ error: 'Blog post not found or unauthorized' });
-        }
-
-        await blog.remove();
+        const blog = await Blog.deleteOne({ _id: req.params.id, owner: currentUser._id });
 
         res.status(200).json({ message: 'Blog post deleted successfully' });
+
     } catch (error) {
+        
         console.error('Error deleting blog post:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
@@ -140,7 +141,7 @@ router.get('/blogs', async (req, res) => {
     }
 });
 
-// Allow users to rate and comment on blog posts
+// Allow users to rate blog posts
 router.post('/rate-blog/:id', authenticateUser, async (req, res) => {
     try {
         const currentUser = req.user;
@@ -151,8 +152,6 @@ router.post('/rate-blog/:id', authenticateUser, async (req, res) => {
             return res.status(404).json({ error: 'Blog post not found' });
         }
 
-        // Add logic to store and handle ratings
-        // For example, you can have a ratings array in your Blog model
         blog.ratings.push({
             user: currentUser._id,
             rating,
@@ -167,6 +166,8 @@ router.post('/rate-blog/:id', authenticateUser, async (req, res) => {
     }
 });
 
+// Allow users to comment on blog posts
+
 router.post('/comment-blog/:id', authenticateUser, async (req, res) => {
     try {
         const currentUser = req.user;
@@ -177,8 +178,6 @@ router.post('/comment-blog/:id', authenticateUser, async (req, res) => {
             return res.status(404).json({ error: 'Blog post not found' });
         }
 
-        // Add logic to store and handle comments
-        // For example, you can have a comments array in your Blog model
         blog.comments.push({
             user: currentUser._id,
             comment,
@@ -194,6 +193,7 @@ router.post('/comment-blog/:id', authenticateUser, async (req, res) => {
 });
 
 // Implement sorting and filtering options for posts
+
 router.get('/filtered-blogs', async (req, res) => {
     try {
         const { sortBy, sortOrder } = req.query;

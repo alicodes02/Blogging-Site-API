@@ -29,22 +29,26 @@ router.post('/signup', async (req,res) => {
         await newUser.save();
 
         const token = jwt.sign({ userName, email }, 'sshhhh', { expiresIn: '1h' });
-        res.json({ token });
+        res.status(200).json({ "message": "Sign Up Successfull!", token });
     }
 });
 
 router.post('/admin', (req, res) => {
 
-    const {userName, password} = req.body;
+    console.log(req.body);
 
-    if(userName === 'admin' && password === '098') {
+    const {username, password} = req.body;
 
-        res.send('Admin Logged In Successfully!');
+    if(username === 'admin' && password === '098') {
+
+        const token = jwt.sign({userName}, 'sshhhh', { expiresIn: '1h' });
+
+        res.status(200).json({"message": "'Admin Logged In Successfully!'", token});
     }
 
     else {
 
-        res.send('Invalid Credentials');
+        res.status(404).send('Invalid Credentials');
     }
 });
 
@@ -60,12 +64,12 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign({ email }, 'sshhhh', { expiresIn: '6h' });
 
-        res.send({ "Message": "Sign in Successful", token});
+        res.status(200).send({ "Message": "Sign in Successful", token});
     }
 
     else {
 
-        res.send('Invalid Credentials!');
+        res.status(404).send('Invalid Credentials!');
     }
 });
 

@@ -6,8 +6,20 @@ const commentSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  content: {
+  comment: {
     type: String,
+    required: true,
+  },
+});
+
+const ratingSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  rating: {
+    type: Number,
     required: true,
   },
 });
@@ -27,10 +39,7 @@ const blogSchema = new mongoose.Schema({
     required: true,
   },
   
-  rating: {
-    type: Number,
-    default: 0,
-  },
+  ratings: [ratingSchema],
   comments: [commentSchema],
 });
 
